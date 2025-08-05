@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotification } from "@/contexts/NotificationContext";
 
 const categories = [
   {
@@ -52,6 +53,7 @@ export default function SelectPage() {
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
   const { user } = useAuth();
+  const { showSuccess, showError, showWarning } = useNotification();
 
   // useEffect(() => {
   //   fetch("/api/subscription-status")
@@ -78,12 +80,12 @@ export default function SelectPage() {
     e.preventDefault();
 
     if (selectedCategories.length === 0) {
-      alert("Please select at least one category");
+      showWarning("Selection Required", "Please select at least one category");
       return;
     }
 
     if (!user) {
-      alert("Please sign in to continue");
+      showError("Authentication Required", "Please sign in to continue");
       return;
     }
 
@@ -103,13 +105,14 @@ export default function SelectPage() {
         throw new Error("Failed to save preferences");
       }
 
-      alert(
-        "Your newsletter preferences have been saved! You'll start receiving newsletters according to your schedule."
+      showSuccess(
+        "Preferences Saved",
+        "You'll start receiving newsletters according to your schedule"
       );
       router.push("/dashboard");
     } catch (error) {
       console.error("Error:", error);
-      alert("Failed to save preferences. Please try again.");
+      showError("Save Failed", "Failed to save preferences. Please try again.");
     } finally {
       setIsSaving(false);
     }

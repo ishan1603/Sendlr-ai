@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotification } from "@/contexts/NotificationContext";
+import ConfirmModal from "@/components/ConfirmModal";
 import Link from "next/link";
 
 interface UserPreferences {
@@ -16,8 +18,13 @@ interface UserPreferences {
 export default function DashboardPage() {
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"pause" | "resume" | null>(
+    null
+  );
   const router = useRouter();
   const { user } = useAuth();
+  const { showSuccess, showError } = useNotification();
 
   useEffect(() => {
     fetch("/api/user-preferences")
@@ -43,44 +50,62 @@ export default function DashboardPage() {
     router.push("/select");
   };
 
-  const handleDeactivateNewsletter = async () => {
-    if (!user) return;
+  const handlePauseClick = () => {
+    setPendingAction("pause");
+    setShowConfirmModal(true);
+  };
+
+  const handleResumeClick = () => {
+    setPendingAction("resume");
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmAction = async () => {
+    if (!user || !pendingAction) return;
+
+    const isActivating = pendingAction === "resume";
 
     try {
       const response = await fetch("/api/user-preferences", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_active: false }),
+        body: JSON.stringify({ is_active: isActivating }),
       });
 
       if (response.ok) {
-        setPreferences((prev) => (prev ? { ...prev, is_active: false } : null));
-        alert("Newsletter deactivated successfully");
+        setPreferences((prev) =>
+          prev ? { ...prev, is_active: isActivating } : null
+        );
+        if (isActivating) {
+          showSuccess(
+            "Newsletter Resumed",
+            "Newsletter has been activated successfully"
+          );
+        } else {
+          showSuccess(
+            "Newsletter Paused",
+            "Newsletter has been deactivated successfully"
+          );
+        }
       }
     } catch (error) {
-      console.error("Error deactivating newsletter:", error);
-      alert("Failed to deactivate newsletter");
+      console.error(
+        `Error ${isActivating ? "activating" : "deactivating"} newsletter:`,
+        error
+      );
+      showError(
+        "Action Failed",
+        `Failed to ${isActivating ? "activate" : "deactivate"} newsletter`
+      );
+    } finally {
+      setShowConfirmModal(false);
+      setPendingAction(null);
     }
   };
 
-  const handleActivateNewsletter = async () => {
-    if (!user) return;
-
-    try {
-      const response = await fetch("/api/user-preferences", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_active: true }),
-      });
-
-      if (response.ok) {
-        setPreferences((prev) => (prev ? { ...prev, is_active: true } : null));
-        alert("Newsletter activated successfully");
-      }
-    } catch (error) {
-      console.error("Error activating newsletter:", error);
-      alert("Failed to activate newsletter");
-    }
+  const handleCancelAction = () => {
+    setShowConfirmModal(false);
+    setPendingAction(null);
   };
 
   if (isLoading) {
@@ -201,7 +226,7 @@ export default function DashboardPage() {
                 <>
                   {preferences.is_active ? (
                     <button
-                      onClick={handleDeactivateNewsletter}
+                      onClick={handlePauseClick}
                       className="w-full flex items-center justify-center px-4 py-3 border-2 border-black text-[10px] bg-white text-black hover:bg-black hover:text-white transition-all cursor-pointer"
                       style={{
                         fontFamily: "Press Start 2P",
@@ -212,7 +237,7 @@ export default function DashboardPage() {
                     </button>
                   ) : (
                     <button
-                      onClick={handleActivateNewsletter}
+                      onClick={handleResumeClick}
                       className="w-full flex items-center justify-center px-4 py-3 border-2 border-black text-[10px] bg-white text-black hover:bg-black hover:text-white transition-all cursor-pointer"
                       style={{
                         fontFamily: "Press Start 2P",
@@ -250,6 +275,24 @@ export default function DashboardPage() {
           </ul>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        title={
+          pendingAction === "pause" ? "Pause Newsletter" : "Resume Newsletter"
+        }
+        message={
+          pendingAction === "pause"
+            ? "Are you sure you want to pause your newsletter? You won't receive any new newsletters until you resume."
+            : "Are you sure you want to resume your newsletter? You'll start receiving newsletters according to your schedule."
+        }
+        confirmText={pendingAction === "pause" ? "PAUSE" : "RESUME"}
+        cancelText="CANCEL"
+        type={pendingAction === "pause" ? "default" : "default"}
+        onConfirm={handleConfirmAction}
+        onCancel={handleCancelAction}
+      />
     </div>
   );
 }
