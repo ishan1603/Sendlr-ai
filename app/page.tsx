@@ -1,5 +1,7 @@
-import Image from "next/image";
-
 export default function Home() {
-  return null;
+  return (
+    <div>
+      <h1>Welcome to Sendlr</h1>
+    </div>
+  );
 }

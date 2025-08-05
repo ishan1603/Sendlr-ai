@@ -31,6 +31,23 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const { showSuccess, showError } = useNotification();
 
+  // Consistent time formatting function to avoid hydration issues
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(":").map(Number);
+    const period = hours >= 12 ? "PM" : "AM";
+    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    return `${displayHours}:${minutes.toString().padStart(2, "0")} ${period}`;
+  };
+
+  // Consistent date formatting function to avoid hydration issues
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
+  };
+
   useEffect(() => {
     fetch("/api/user-preferences")
       .then((response) => {
@@ -86,9 +103,10 @@ export default function DashboardPage() {
       });
 
       if (response.ok) {
+        const timeString = `${scheduledTime.getHours().toString().padStart(2, "0")}:${scheduledTime.getMinutes().toString().padStart(2, "0")}`;
         showSuccess(
           "Newsletter Scheduled",
-          `Newsletter scheduled for ${scheduledTime.toLocaleDateString()} at ${scheduledTime.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true })}`
+          `Newsletter scheduled for ${formatDate(scheduledTime.toISOString())} at ${formatTime(timeString)}`
         );
       } else {
         const errorData = await response.json();
@@ -250,13 +268,7 @@ export default function DashboardPage() {
                   <h3 className="text-[12px] text-black mb-2">SEND TIME</h3>
                   <p className="text-[10px] text-black">
                     {preferences.send_time
-                      ? new Date(
-                          `2000-01-01T${preferences.send_time}`
-                        ).toLocaleTimeString([], {
-                          hour: "numeric",
-                          minute: "2-digit",
-                          hour12: true,
-                        })
+                      ? formatTime(preferences.send_time)
                       : "9:00 AM"}
                   </p>
                 </div>
@@ -278,7 +290,7 @@ export default function DashboardPage() {
                 <div>
                   <h3 className="text-[12px] text-black mb-2">CREATED</h3>
                   <p className="text-[10px] text-black">
-                    {new Date(preferences.created_at).toLocaleDateString()}
+                    {formatDate(preferences.created_at)}
                   </p>
                 </div>
               </div>

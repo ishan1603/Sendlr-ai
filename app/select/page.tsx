@@ -57,6 +57,14 @@ export default function SelectPage() {
   const { user } = useAuth();
   const { showSuccess, showError, showWarning } = useNotification();
 
+  // Consistent time formatting function to avoid hydration issues
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  };
+
   useEffect(() => {
     if (user) {
       fetch("/api/user-preferences")
@@ -287,11 +295,7 @@ export default function SelectPage() {
               {selectedCategories.length} CATEGOR
               {selectedCategories.length !== 1 ? "IES" : "Y"} •{" "}
               {selectedFrequency.toUpperCase()} •{" "}
-              {new Date(`2000-01-01T${selectedTime}`).toLocaleTimeString([], {
-                hour: "numeric",
-                minute: "2-digit",
-                hour12: true,
-              })}
+              {formatTime(selectedTime)}
             </div>
             <button
               type="submit"
