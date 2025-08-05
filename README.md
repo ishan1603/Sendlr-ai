@@ -11,6 +11,8 @@
   </div>
 
   <h3 align="center">Sendlr AI - AI-Powered Newsletter SaaS with Next.js, Supabase & Groq</h3>
+  <img src="public/Screenshot 2025-08-06 000305.png" alt="demo" />
+
 </div>
 
 ## 📋 <a name="table">Table of Contents</a>
