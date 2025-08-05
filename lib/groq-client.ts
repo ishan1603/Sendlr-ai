@@ -95,12 +95,12 @@ Please create a well-structured newsletter with:
 4. Professional HTML formatting
 5. Only English content
 
-Make sure BOTH categories are represented with quality content.`,
+Make sure ALL selected categories (${categories.join(", ")}) are represented with quality content. Distribute the articles evenly across all categories.`,
         },
       ],
       model: "llama-3.1-70b-versatile", // Fast and free model
       temperature: 0.7,
-      max_tokens: 1000,
+      max_tokens: 2000, // Increased to handle multiple categories
     });
 
     const result = completion.choices[0]?.message?.content;
@@ -119,24 +119,53 @@ Make sure BOTH categories are represented with quality content.`,
 
 function generateFallbackNewsletter(articles: any[], categories: string[]) {
   console.log("Using fallback newsletter generation");
+  console.log(
+    `Fallback: ${articles.length} articles across ${categories.length} categories`
+  );
 
-  return `<h2>Newsletter Summary - ${new Date().toLocaleDateString()}</h2>
+  // Distribute articles across categories more evenly
+  const articlesByCategory: { [key: string]: any[] } = {};
+  categories.forEach((cat) => (articlesByCategory[cat] = []));
+
+  // Group articles by category
+  articles.forEach((article) => {
+    if (articlesByCategory[article.category]) {
+      articlesByCategory[article.category].push(article);
+    }
+  });
+
+  // Show breakdown
+  console.log(
+    "Fallback articles by category:",
+    categories
+      .map((cat) => `${cat}: ${articlesByCategory[cat].length}`)
+      .join(", ")
+  );
+
+  let content = `<h2>Newsletter Summary - ${new Date().toLocaleDateString()}</h2>
     
-<p>📰 Today's Top Stories from ${categories.join(", ")}:</p>
+<p>📰 Today's Top Stories from ${categories.join(", ")}:</p>`;
 
-${articles
-  .slice(0, 5)
-  .map(
-    (article: any, idx: number) =>
-      `<h3>${idx + 1}. ${article.title}</h3>
+  // Add articles from each category
+  let articleCount = 0;
+  categories.forEach((category) => {
+    const categoryArticles = articlesByCategory[category];
+    if (categoryArticles.length > 0) {
+      content += `\n\n<h3>📂 ${category.toUpperCase()}</h3>`;
+      categoryArticles.slice(0, 2).forEach((article: any) => {
+        articleCount++;
+        content += `\n<h4>${articleCount}. ${article.title}</h4>
 <p><strong>Category:</strong> ${article.category}</p>
 <p>${article.description}</p>
 <p><a href="${article.url}" target="_blank">Read more →</a></p>
-<hr>`
-  )
-  .join("\n")}
+<hr>`;
+      });
+    }
+  });
 
-<p><em>Generated with Groq AI (fallback mode)</em></p>`;
+  content += `\n<p><em>Generated with Groq AI (fallback mode)</em></p>`;
+
+  return content;
 }
 
 export { groq };

@@ -15,7 +15,17 @@ export async function fetchArticles(
             ? "sports NFL NBA MLB soccer olympics championship tournament -entertainment -movies -gaming"
             : category === "technology"
               ? "technology software hardware AI startup cybersecurity innovation -entertainment -movies -gaming -betting"
-              : category;
+              : category === "politics"
+                ? "politics government election policy legislation democracy congress senate -entertainment -sports -gaming"
+                : category === "environment"
+                  ? "environment climate change sustainability renewable energy conservation pollution -entertainment -sports -gaming"
+                  : category === "health"
+                    ? "health medical healthcare medicine disease treatment wellness -entertainment -sports -gaming"
+                    : category === "entertainment"
+                      ? "entertainment movies music celebrities hollywood streaming -sports -politics -technology"
+                      : category === "business"
+                        ? "business finance economy markets stocks corporate earnings -entertainment -sports -gaming"
+                        : category;
 
       console.log(
         `Fetching articles for category: ${category} with query: ${searchQuery}`
@@ -24,7 +34,13 @@ export async function fetchArticles(
       const response = await fetch(
         `https://newsapi.org/v2/everything?q=${encodeURIComponent(
           searchQuery
-        )}&from=${since}&sortBy=publishedAt&language=en&domains=techcrunch.com,arstechnica.com,reuters.com,bbc.com,cnn.com,espn.com,sciencedaily.com,nature.com&apiKey=${process.env.NEWS_API_KEY}`
+        )}&from=${since}&sortBy=publishedAt&language=en&domains=techcrunch.com,arstechnica.com,reuters.com,bbc.com,cnn.com,espn.com,sciencedaily.com,nature.com,politico.com,washingtonpost.com,theguardian.com,businessinsider.com,variety.com,deadline.com,healthline.com,webmd.com&apiKey=${process.env.NEWS_API_KEY}`,
+        {
+          headers: {
+            'User-Agent': 'Sendlr-AI/1.0 (Newsletter Application)',
+            'Accept': 'application/json',
+          },
+        }
       );
 
       if (!response.ok) {
@@ -41,9 +57,27 @@ export async function fetchArticles(
             ? "science"
             : category === "sports"
               ? "sports"
-              : "technology";
+              : category === "technology"
+                ? "technology"
+                : category === "politics"
+                  ? "general" // Politics often falls under general news
+                  : category === "environment"
+                    ? "science" // Environment news often categorized under science
+                    : category === "health"
+                      ? "health"
+                      : category === "entertainment"
+                        ? "entertainment"
+                        : category === "business"
+                          ? "business"
+                          : "general"; // Default fallback
         const fallbackResponse = await fetch(
-          `https://newsapi.org/v2/top-headlines?category=${fallbackCategory}&language=en&country=us&apiKey=${process.env.NEWS_API_KEY}`
+          `https://newsapi.org/v2/top-headlines?category=${fallbackCategory}&language=en&country=us&apiKey=${process.env.NEWS_API_KEY}`,
+          {
+            headers: {
+              'User-Agent': 'Sendlr-AI/1.0 (Newsletter Application)',
+              'Accept': 'application/json',
+            },
+          }
         );
 
         if (fallbackResponse.ok) {
@@ -85,7 +119,13 @@ export async function fetchArticles(
         const simpleResponse = await fetch(
           `https://newsapi.org/v2/everything?q=${encodeURIComponent(
             simpleQuery
-          )}&from=${since}&sortBy=publishedAt&language=en&apiKey=${process.env.NEWS_API_KEY}`
+          )}&from=${since}&sortBy=publishedAt&language=en&apiKey=${process.env.NEWS_API_KEY}`,
+          {
+            headers: {
+              'User-Agent': 'Sendlr-AI/1.0 (Newsletter Application)',
+              'Accept': 'application/json',
+            },
+          }
         );
 
         if (simpleResponse.ok) {
