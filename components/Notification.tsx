@@ -23,10 +23,8 @@ export default function Notification({
   const [isLeaving, setIsLeaving] = useState(false);
 
   useEffect(() => {
-    // Animate in
     const timer = setTimeout(() => setIsVisible(true), 10);
 
-    // Auto close
     const autoCloseTimer = setTimeout(() => {
       handleClose();
     }, duration);
@@ -38,7 +36,6 @@ export default function Notification({
   }, [duration]);
 
   useEffect(() => {
-    // Add keyboard support for closing with Escape
     const handleKeydown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         handleClose();

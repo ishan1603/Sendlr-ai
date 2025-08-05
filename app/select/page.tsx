@@ -57,7 +57,6 @@ export default function SelectPage() {
   const { user } = useAuth();
   const { showSuccess, showError, showWarning } = useNotification();
 
-  // Load existing preferences if available
   useEffect(() => {
     if (user) {
       fetch("/api/user-preferences")
@@ -79,19 +78,6 @@ export default function SelectPage() {
         });
     }
   }, [user]);
-
-  // useEffect(() => {
-  //   fetch("/api/subscription-status")
-  //     .then((r) => r.json())
-  //     .then((json) => {
-  //       if (!json.active) {
-  //         router.replace("/subscribe");
-  //       }
-  //     })
-  //     .catch(() => {
-  //       router.replace("/subscribe");
-  //     });
-  // }, [router]);
 
   const handleCategoryToggle = (categoryId: string) => {
     setSelectedCategories((prev) =>
@@ -155,7 +141,6 @@ export default function SelectPage() {
         </div>
 
         <form onSubmit={handleSavePreferences} className="card bg-white p-6">
-          {/* Categories Section */}
           <div className="mb-8">
             <h2 className="text-[14px] text-black mb-4">CHOOSE CATEGORIES</h2>
             <p className="text-[10px] text-black mb-6">
@@ -282,7 +267,6 @@ export default function SelectPage() {
             </div>
           </div>
 
-          {/* Send Time Section */}
           <div className="mb-8">
             <h2 className="text-[14px] text-black mb-4">DELIVERY TIME</h2>
             <p className="text-[10px] text-black mb-6">
@@ -298,7 +282,6 @@ export default function SelectPage() {
             </div>
           </div>
 
-          {/* Submit Button */}
           <div className="flex items-center justify-between">
             <div className="text-[10px] text-black">
               {selectedCategories.length} CATEGOR

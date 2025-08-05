@@ -214,7 +214,6 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Current Preferences */}
           <div className="card bg-white p-6">
             <h2 className="text-[14px] text-black mb-4">CURRENT SETTINGS</h2>
 
@@ -302,7 +301,6 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Actions */}
           <div className="card bg-white p-6">
             <h2 className="text-[14px] text-black mb-4">ACTIONS</h2>
 
@@ -384,7 +382,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Information */}
         <div className="mt-8 card bg-white p-6">
           <h3 className="text-[12px] text-black mb-2">HOW IT WORKS</h3>
           <ul className="text-[10px] text-black space-y-1">
@@ -398,7 +395,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Confirmation Modal */}
       <ConfirmModal
         isOpen={showConfirmModal}
         title={
@@ -430,7 +426,6 @@ export default function DashboardPage() {
         onCancel={handleCancelAction}
       />
 
-      {/* Schedule Modal */}
       <ScheduleModal
         isOpen={showScheduleModal}
         onClose={handleScheduleCancel}

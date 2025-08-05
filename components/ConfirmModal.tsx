@@ -52,13 +52,11 @@ export default function ConfirmModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black bg-opacity-50"
         onClick={handleCancel}
       />
 
-      {/* Modal */}
       <div
         className={`
           relative bg-white border-2 border-black p-6 max-w-md w-full

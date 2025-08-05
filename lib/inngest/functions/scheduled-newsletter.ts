@@ -9,7 +9,6 @@ export default inngest.createFunction(
   { id: "newsletter/scheduled" },
   { event: "newsletter.schedule" },
   async ({ event, step, runId }) => {
-    // Check if user is still active before proceeding (unless it's an immediate send or scheduled send)
     if (!event.data.isImmediate && !event.data.isScheduled) {
       const isUserActive = await step.run("check-user-status", async () => {
         const supabase = await createClient();
@@ -72,14 +71,12 @@ export default inngest.createFunction(
             .join(", ")
         );
 
-        // Use summary directly as newsletter content
         const newsletterContent = summary;
 
         if (!newsletterContent) {
           throw new Error("Failed to generate newsletter content");
         }
 
-        // Fix: Actually convert markdown to HTML
         const htmlResult = await marked(newsletterContent);
 
         return {
@@ -95,7 +92,6 @@ export default inngest.createFunction(
       }
     );
 
-    // Move send-email to its own step (not nested)
     await step.run("send-email", async () => {
       await sendEmail(
         event.data.email,

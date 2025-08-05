@@ -32,14 +32,12 @@ export async function sendEmail(
         </div>
       </div>
 
-      <!-- Date & Info Bar -->
       <div style="background: #eeeeee; padding: 15px 25px; border-bottom: 2px solid #333333;">
         <div style="font-size: 11px; text-align: center;">
           📅 ${new Date().toLocaleDateString()} • 📂 ${categories.toUpperCase()} • 📊 ${article_count} STORIES
         </div>
       </div>
 
-      <!-- Main Content -->
       <div style="padding: 30px 25px; font-size: 12px; line-height: 1.8; color: #444444;">
         ${newsletter_content}
       </div>

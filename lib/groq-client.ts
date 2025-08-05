@@ -1,8 +1,7 @@
 import Groq from "groq-sdk";
 
-// Get your free API key from: https://console.groq.com/keys
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY, // Add this to your .env.local
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 export async function generateNewsletterSummary(
@@ -13,7 +12,6 @@ export async function generateNewsletterSummary(
     `Generating newsletter for ${articles.length} articles in categories: ${categories.join(", ")}`
   );
 
-  // Check if we have articles
   if (!articles || articles.length === 0) {
     console.error("No articles provided to generate newsletter");
     return `<h2>Newsletter Summary - ${new Date().toLocaleDateString()}</h2>
@@ -29,7 +27,6 @@ export async function generateNewsletterSummary(
 <p><em>Generated with Groq AI</em></p>`;
   }
 
-  // Check API key
   if (!process.env.GROQ_API_KEY) {
     console.error("GROQ_API_KEY is not set in environment variables");
     return generateFallbackNewsletter(articles, categories);
@@ -98,9 +95,9 @@ Please create a well-structured newsletter with:
 Make sure ALL selected categories (${categories.join(", ")}) are represented with quality content. Distribute the articles evenly across all categories.`,
         },
       ],
-      model: "llama-3.1-8b-instant", // Fast and free model (updated)
+      model: "llama-3.1-8b-instant",
       temperature: 0.7,
-      max_tokens: 2000, // Increased to handle multiple categories
+      max_tokens: 2000,
     });
 
     const result = completion.choices[0]?.message?.content;
@@ -123,18 +120,15 @@ function generateFallbackNewsletter(articles: any[], categories: string[]) {
     `Fallback: ${articles.length} articles across ${categories.length} categories`
   );
 
-  // Distribute articles across categories more evenly
   const articlesByCategory: { [key: string]: any[] } = {};
   categories.forEach((cat) => (articlesByCategory[cat] = []));
 
-  // Group articles by category
   articles.forEach((article) => {
     if (articlesByCategory[article.category]) {
       articlesByCategory[article.category].push(article);
     }
   });
 
-  // Show breakdown
   console.log(
     "Fallback articles by category:",
     categories
@@ -146,7 +140,6 @@ function generateFallbackNewsletter(articles: any[], categories: string[]) {
     
 <p>📰 Today's Top Stories from ${categories.join(", ")}:</p>`;
 
-  // Add articles from each category
   let articleCount = 0;
   categories.forEach((category) => {
     const categoryArticles = articlesByCategory[category];

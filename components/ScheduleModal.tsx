@@ -27,7 +27,6 @@ export default function ScheduleModal({
 
   if (!isOpen) return null;
 
-  // Generate time options (every hour from 6 AM to 11 PM)
   const timeOptions = [];
   for (let hour = 6; hour <= 23; hour++) {
     const time24 = hour.toString().padStart(2, "0") + ":00";

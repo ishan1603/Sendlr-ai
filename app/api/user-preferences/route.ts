@@ -5,7 +5,6 @@ import { inngest } from "@/lib/inngest/client";
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
 
-  // Get the user session
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -35,7 +34,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save user preferences to database
     const { error: upsertError } = await supabase
       .from("user_preferences")
       .upsert(
@@ -58,7 +56,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Schedule the first newsletter based on frequency
     let scheduleTime: Date;
     const now = new Date();
     const [sendHour, sendMinute] = (send_time || "09:00")
@@ -67,17 +64,14 @@ export async function POST(request: NextRequest) {
 
     switch (frequency) {
       case "daily":
-        // Schedule for tomorrow at specified time
         scheduleTime = new Date(now.getTime() + 24 * 60 * 60 * 1000);
         scheduleTime.setHours(sendHour, sendMinute, 0, 0);
         break;
       case "weekly":
-        // Schedule for next week on the same day at specified time
         scheduleTime = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
         scheduleTime.setHours(sendHour, sendMinute, 0, 0);
         break;
       case "biweekly":
-        // Schedule for 14 days from now at specified time
         scheduleTime = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
         scheduleTime.setHours(sendHour, sendMinute, 0, 0);
         break;
@@ -146,22 +140,17 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // If deactivating the newsletter, cancel all scheduled functions for this user
     if (!is_active) {
       try {
-        // Cancel all pending newsletter.schedule events for this user
         await cancelUserNewsletterEvents(user.id);
       } catch (cancelError) {
         console.error("Error canceling scheduled events:", cancelError);
-        // Don't fail the request if cancellation fails, just log it
       }
     } else {
-      // If reactivating the newsletter, schedule the next one
       try {
         await rescheduleUserNewsletter(user.id);
       } catch (rescheduleError) {
         console.error("Error rescheduling newsletter:", rescheduleError);
-        // Don't fail the request if rescheduling fails, just log it
       }
     }
 
@@ -178,7 +167,6 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-// Function to cancel all scheduled newsletter events for a user
 async function cancelUserNewsletterEvents(userId: string) {
   const INNGEST_API =
     process.env.NODE_ENV === "production"
@@ -212,15 +200,12 @@ async function cancelUserNewsletterEvents(userId: string) {
       `Found ${userNewsletterEvents.length} newsletter events for user ${userId}`
     );
 
-    // Log the events that would be affected
     for (const event of userNewsletterEvents) {
       console.log(
         `Event ${event.id} scheduled for ${new Date(event.ts).toISOString()}`
       );
     }
 
-    // Note: We can't actually cancel events via API, but the function will check
-    // the user's is_active status and exit early if they've paused their newsletter
     console.log(
       `User ${userId} newsletter paused. Existing events will be skipped when they run.`
     );
@@ -230,7 +215,6 @@ async function cancelUserNewsletterEvents(userId: string) {
   }
 }
 
-// Function to reschedule newsletter for a user when they reactivate
 async function rescheduleUserNewsletter(userId: string) {
   const supabase = await createClient();
 
