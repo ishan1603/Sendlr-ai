@@ -2,12 +2,13 @@ import { inngest } from "../client";
 import { fetchArticles } from "@/lib/news";
 import { generateNewsletterSummary } from "@/lib/groq-client";
 import { marked } from "marked";
+import { sendEmail } from "@/lib/email";
 
 export default inngest.createFunction(
   { id: "newsletter/scheduled" },
   { event: "newsletter.schedule" },
   async ({ event, step, runId }) => {
-    const categories = ["technology", "business", "politics"];
+    const categories = event.data.categories;
 
     const allArticles = await step.run("fetch-news", async () => {
       return fetchArticles(categories);
@@ -30,18 +31,16 @@ export default inngest.createFunction(
         }
 
         // Fix: Actually convert markdown to HTML
-        const htmlResult = marked(newsletterContent);
-
-        return {
-          content: newsletterContent,
-          html: htmlResult,
-          timestamp: new Date().toISOString(),
-          categories: categories,
-          articleCount: allArticles.length,
-        };
+        const htmlResult = await marked(newsletterContent);
+        await step.run("send-email", async () => {
+          await sendEmail(
+            event.data.email,
+            event.data.categories.join(", "),
+            allArticles.length,
+            htmlResult
+          );
+        });
       }
     );
-
-    return processedNewsletter;
   }
 );
