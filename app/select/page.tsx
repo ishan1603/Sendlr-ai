@@ -116,41 +116,37 @@ export default function SelectPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Customize Your Newsletter
-          </h1>
-          <p className="text-xl text-gray-600">
-            Select your interests and delivery frequency to start receiving
-            personalized newsletters
+          <h1 className="text-[16px] text-black mb-4">CUSTOMIZE NEWSLETTER</h1>
+          <p className="text-[12px] text-black">
+            SELECT INTERESTS AND DELIVERY FREQUENCY
           </p>
         </div>
 
-        <form
-          onSubmit={handleSavePreferences}
-          className="bg-white rounded-lg shadow-lg p-6"
-        >
+        <form onSubmit={handleSavePreferences} className="card bg-white p-6">
           {/* Categories Section */}
           <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              Choose Your Categories
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Select the topics you'd like to see in your personalized
-              newsletter
+            <h2 className="text-[14px] text-black mb-4">CHOOSE CATEGORIES</h2>
+            <p className="text-[10px] text-black mb-6">
+              SELECT TOPICS FOR YOUR PERSONALIZED NEWSLETTER
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               {categories.map((category) => (
                 <label
                   key={category.id}
-                  className={`relative flex items-start p-4 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md ${
+                  className={`relative flex items-start p-4 border-2 border-black cursor-pointer transition-all ${
                     selectedCategories.includes(category.id)
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "bg-black text-white"
+                      : "bg-white text-black hover:bg-black hover:text-white"
                   }`}
+                  style={{
+                    boxShadow: selectedCategories.includes(category.id)
+                      ? "none"
+                      : "2px 2px 0px #000000",
+                  }}
                 >
                   <input
                     type="checkbox"
@@ -160,63 +156,63 @@ export default function SelectPage() {
                   />
                   <div className="flex items-center h-5">
                     <div
-                      className={`w-5 h-5 border-2 rounded flex items-center justify-center ${
+                      className={`w-4 h-4 border-2 flex items-center justify-center ${
                         selectedCategories.includes(category.id)
-                          ? "border-blue-500 bg-blue-500"
-                          : "border-gray-300"
+                          ? "border-white bg-white"
+                          : "border-black bg-white"
                       }`}
                     >
                       {selectedCategories.includes(category.id) && (
-                        <svg
-                          className="w-3 h-3 text-white"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
+                        <div className="w-2 h-2 bg-black"></div>
                       )}
                     </div>
                   </div>
                   <div className="ml-3">
-                    <div className="text-sm font-medium text-gray-900">
-                      {category.name}
+                    <div
+                      className="text-[10px] font-normal"
+                      style={{ fontFamily: "Press Start 2P" }}
+                    >
+                      {category.name.toUpperCase()}
                     </div>
-                    <div className="text-sm text-gray-500">
-                      {category.description}
+                    <div
+                      className="text-[8px] mt-1"
+                      style={{ fontFamily: "Press Start 2P" }}
+                    >
+                      {category.description.toUpperCase()}
                     </div>
                   </div>
                 </label>
               ))}
             </div>
 
-            <div className="text-sm text-gray-600 mb-6">
-              {selectedCategories.length} categor
-              {selectedCategories.length !== 1 ? "ies" : "y"} selected
+            <div className="text-[10px] text-black mb-6">
+              {selectedCategories.length} CATEGOR
+              {selectedCategories.length !== 1 ? "IES" : "Y"} SELECTED
             </div>
           </div>
 
           {/* Frequency Section */}
           <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              Delivery Frequency
-            </h2>
-            <p className="text-gray-600 mb-6">
-              How often would you like to receive your newsletter?
+            <h2 className="text-[14px] text-black mb-4">DELIVERY FREQUENCY</h2>
+            <p className="text-[10px] text-black mb-6">
+              HOW OFTEN TO RECEIVE NEWSLETTER?
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {frequencyOptions.map((frequency) => (
                 <label
                   key={frequency.id}
-                  className={`relative flex items-start p-4 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md ${
+                  className={`relative flex items-start p-4 border-2 border-black cursor-pointer transition-all ${
                     selectedFrequency === frequency.id
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "bg-black text-white"
+                      : "bg-white text-black hover:bg-black hover:text-white"
                   }`}
+                  style={{
+                    boxShadow:
+                      selectedFrequency === frequency.id
+                        ? "none"
+                        : "2px 2px 0px #000000",
+                  }}
                 >
                   <input
                     type="radio"
@@ -227,23 +223,29 @@ export default function SelectPage() {
                   />
                   <div className="flex items-center h-5">
                     <div
-                      className={`w-5 h-5 border-2 rounded-full flex items-center justify-center ${
+                      className={`w-4 h-4 border-2 flex items-center justify-center ${
                         selectedFrequency === frequency.id
-                          ? "border-blue-500 bg-blue-500"
-                          : "border-gray-300"
+                          ? "border-white bg-white"
+                          : "border-black bg-white"
                       }`}
                     >
                       {selectedFrequency === frequency.id && (
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                        <div className="w-2 h-2 bg-black"></div>
                       )}
                     </div>
                   </div>
                   <div className="ml-3">
-                    <div className="text-sm font-medium text-gray-900">
-                      {frequency.name}
+                    <div
+                      className="text-[10px] font-normal"
+                      style={{ fontFamily: "Press Start 2P" }}
+                    >
+                      {frequency.name.toUpperCase()}
                     </div>
-                    <div className="text-sm text-gray-500">
-                      {frequency.description}
+                    <div
+                      className="text-[8px] mt-1"
+                      style={{ fontFamily: "Press Start 2P" }}
+                    >
+                      {frequency.description.toUpperCase()}
                     </div>
                   </div>
                 </label>
@@ -253,20 +255,28 @@ export default function SelectPage() {
 
           {/* Submit Button */}
           <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              {selectedCategories.length} categor
-              {selectedCategories.length !== 1 ? "ies" : "y"} selected •
-              {selectedFrequency} delivery
+            <div className="text-[10px] text-black">
+              {selectedCategories.length} CATEGOR
+              {selectedCategories.length !== 1 ? "IES" : "Y"} •{" "}
+              {selectedFrequency.toUpperCase()}
             </div>
             <button
               type="submit"
-              className={`px-6 py-3 rounded-lg font-medium text-white transition-colors ${
-                selectedCategories.length === 0
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
+              disabled={selectedCategories.length === 0 || isSaving}
+              className={`px-6 py-3 border-2 border-black text-[10px] font-normal cursor-pointer transition-all ${
+                selectedCategories.length === 0 || isSaving
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-white text-black hover:bg-black hover:text-white"
               }`}
+              style={{
+                fontFamily: "Press Start 2P",
+                boxShadow:
+                  selectedCategories.length === 0 || isSaving
+                    ? "none"
+                    : "3px 3px 0px #000000",
+              }}
             >
-              Save Preferences
+              {isSaving ? "SAVING..." : "SAVE PREFERENCES"}
             </button>
           </div>
         </form>

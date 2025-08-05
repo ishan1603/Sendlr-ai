@@ -85,131 +85,116 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-white py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-lg text-gray-600">Loading your dashboard...</p>
+          <div
+            className="w-16 h-16 border-4 border-black border-t-transparent animate-spin mx-auto mb-4"
+            style={{ borderRadius: "0" }}
+          ></div>
+          <p className="text-[12px] text-black">LOADING DASHBOARD...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Your Newsletter Dashboard
-          </h1>
-          <p className="text-xl text-gray-600">
-            Manage your personalized newsletter preferences
+          <h1 className="text-[16px] text-black mb-4">NEWSLETTER DASHBOARD</h1>
+          <p className="text-[12px] text-black">
+            MANAGE YOUR AI-CURATED DIGEST
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Current Preferences */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              Current Preferences
-            </h2>
+          <div className="card bg-white p-6">
+            <h2 className="text-[14px] text-black mb-4">CURRENT SETTINGS</h2>
 
             {preferences ? (
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Categories
-                  </h3>
+                  <h3 className="text-[12px] text-black mb-2">CATEGORIES</h3>
                   <div className="flex flex-wrap gap-2">
                     {preferences.categories.map((category) => (
                       <span
                         key={category}
-                        className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                        className="px-3 py-1 bg-black text-white text-[10px] border-2 border-black"
+                        style={{ fontFamily: "Press Start 2P" }}
                       >
-                        {category}
+                        {category.toUpperCase()}
                       </span>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Frequency
-                  </h3>
-                  <p className="text-gray-600 capitalize">
-                    {preferences.frequency}
+                  <h3 className="text-[12px] text-black mb-2">FREQUENCY</h3>
+                  <p className="text-[10px] text-black">
+                    {preferences.frequency.toUpperCase()}
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Email
-                  </h3>
-                  <p className="text-gray-600">{preferences.email}</p>
+                  <h3 className="text-[12px] text-black mb-2">EMAIL</h3>
+                  <p className="text-[10px] text-black">{preferences.email}</p>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Status
-                  </h3>
+                  <h3 className="text-[12px] text-black mb-2">STATUS</h3>
                   <div className="flex items-center">
                     <div
-                      className={`w-3 h-3 rounded-full mr-2 ${
-                        preferences.is_active ? "bg-green-500" : "bg-red-500"
+                      className={`w-3 h-3 mr-2 border-2 border-black ${
+                        preferences.is_active ? "bg-black" : "bg-white"
                       }`}
                     ></div>
-                    <span className="text-gray-600">
-                      {preferences.is_active ? "Active" : "Inactive"}
+                    <span className="text-[10px] text-black">
+                      {preferences.is_active ? "ACTIVE" : "INACTIVE"}
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Created
-                  </h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-[12px] text-black mb-2">CREATED</h3>
+                  <p className="text-[10px] text-black">
                     {new Date(preferences.created_at).toLocaleDateString()}
                   </p>
                 </div>
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-gray-600 mb-4">No preferences set yet</p>
+                <p className="text-[10px] text-black mb-4">
+                  NO PREFERENCES SET
+                </p>
                 <Link
                   href="/select"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                  className="inline-flex items-center px-4 py-2 border-2 border-black bg-white text-black hover:bg-black hover:text-white transition-all text-[10px] cursor-pointer"
+                  style={{
+                    fontFamily: "Press Start 2P",
+                    boxShadow: "3px 3px 0px #000000",
+                  }}
                 >
-                  Set Up Newsletter
+                  SETUP NEWSLETTER
                 </Link>
               </div>
             )}
           </div>
 
           {/* Actions */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              Actions
-            </h2>
+          <div className="card bg-white p-6">
+            <h2 className="text-[14px] text-black mb-4">ACTIONS</h2>
 
             <div className="space-y-4">
               <button
                 onClick={handleUpdatePreferences}
-                className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                className="w-full flex items-center justify-center px-4 py-3 border-2 border-black text-[10px] bg-white text-black hover:bg-black hover:text-white transition-all cursor-pointer"
+                style={{
+                  fontFamily: "Press Start 2P",
+                  boxShadow: "3px 3px 0px #000000",
+                }}
               >
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-                Update Preferences
+                UPDATE PREFERENCES
               </button>
 
               {preferences && (
@@ -217,89 +202,51 @@ export default function DashboardPage() {
                   {preferences.is_active ? (
                     <button
                       onClick={handleDeactivateNewsletter}
-                      className="w-full flex items-center justify-center px-4 py-3 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 transition-colors"
+                      className="w-full flex items-center justify-center px-4 py-3 border-2 border-black text-[10px] bg-white text-black hover:bg-black hover:text-white transition-all cursor-pointer"
+                      style={{
+                        fontFamily: "Press Start 2P",
+                        boxShadow: "3px 3px 0px #000000",
+                      }}
                     >
-                      <svg
-                        className="w-5 h-5 mr-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"
-                        />
-                      </svg>
-                      Pause Newsletter
+                      PAUSE NEWSLETTER
                     </button>
                   ) : (
                     <button
                       onClick={handleActivateNewsletter}
-                      className="w-full flex items-center justify-center px-4 py-3 border border-green-300 text-sm font-medium rounded-md text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
+                      className="w-full flex items-center justify-center px-4 py-3 border-2 border-black text-[10px] bg-white text-black hover:bg-black hover:text-white transition-all cursor-pointer"
+                      style={{
+                        fontFamily: "Press Start 2P",
+                        boxShadow: "3px 3px 0px #000000",
+                      }}
                     >
-                      <svg
-                        className="w-5 h-5 mr-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      Resume Newsletter
+                      RESUME NEWSLETTER
                     </button>
                   )}
                 </>
               )}
 
               <Link
-                href="/subscribe"
-                className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                href="/select"
+                className="w-full flex items-center justify-center px-4 py-3 border-2 border-black text-[10px] bg-white text-black hover:bg-black hover:text-white transition-all cursor-pointer"
+                style={{
+                  fontFamily: "Press Start 2P",
+                  boxShadow: "3px 3px 0px #000000",
+                }}
               >
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                  />
-                </svg>
-                Manage Subscription
+                MANAGE SUBSCRIPTION
               </Link>
             </div>
           </div>
         </div>
 
         {/* Information */}
-        <div className="mt-8 bg-blue-50 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-blue-900 mb-2">
-            How it works
-          </h3>
-          <ul className="text-blue-800 space-y-1">
-            <li>
-              • Your newsletter is automatically generated based on your
-              selected categories
-            </li>
-            <li>
-              • Newsletters are delivered to your email at 9 AM according to
-              your chosen frequency
-            </li>
-            <li>• You can pause or resume your newsletter at any time</li>
-            <li>
-              • Update your preferences anytime to change categories or
-              frequency
-            </li>
+        <div className="mt-8 card bg-white p-6">
+          <h3 className="text-[12px] text-black mb-2">HOW IT WORKS</h3>
+          <ul className="text-[10px] text-black space-y-1">
+            <li>{">"} NEWSLETTER AUTO-GENERATED FROM YOUR CATEGORIES</li>
+            <li>{">"} DELIVERED AT 9 AM BASED ON YOUR FREQUENCY</li>
+            <li>{">"} PAUSE/RESUME ANYTIME</li>
+            <li>{">"} UPDATE PREFERENCES TO CHANGE SETTINGS</li>
           </ul>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
@@ -17,20 +18,34 @@ export default function Navbar() {
   }
 
   return (
-    <header className="bg-white shadow-sm border-b">
+    <header className="bg-white border-b-2 border-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           <div className="flex items-center">
-            <h1 className="text-xl font-semibold text-gray-900">Sendlr/ai</h1>
+            <Image
+              src="/logo.png"
+              alt="Sendlr/ai"
+              width={120}
+              height={40}
+              className="pixelated cursor-pointer"
+              style={{ imageRendering: "pixelated" }}
+              onClick={() => router.push("/dashboard")}
+            />
           </div>
 
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">Welcome, {user.email}</span>
+          <div className="flex items-center space-x-6">
+            <span className="text-[10px] text-black">
+              Welcome, {user.email}
+            </span>
             <button
               onClick={handleLogout}
-              className="inline-flex items-center cursor-pointer px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+              className="px-4 py-2 border-2 border-black bg-white text-black hover:bg-black hover:text-white transition-all text-[10px] font-normal cursor-pointer"
+              style={{
+                fontFamily: "Press Start 2P",
+                boxShadow: "3px 3px 0px #000000",
+              }}
             >
-              Logout
+              LOGOUT
             </button>
           </div>
         </div>

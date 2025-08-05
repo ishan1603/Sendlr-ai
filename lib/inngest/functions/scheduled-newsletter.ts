@@ -22,6 +22,15 @@ export default inngest.createFunction(
       "process-newsletter",
       async () => {
         console.log("Raw summary:", summary);
+        console.log(
+          `Articles breakdown by category:`,
+          categories
+            .map(
+              (cat: string) =>
+                `${cat}: ${allArticles.filter((a) => a.category === cat).length}`
+            )
+            .join(", ")
+        );
 
         // Use summary directly as newsletter content
         const newsletterContent = summary;
@@ -32,15 +41,28 @@ export default inngest.createFunction(
 
         // Fix: Actually convert markdown to HTML
         const htmlResult = await marked(newsletterContent);
-        await step.run("send-email", async () => {
-          await sendEmail(
-            event.data.email,
-            event.data.categories.join(", "),
-            allArticles.length,
-            htmlResult
-          );
-        });
+
+        return {
+          content: newsletterContent,
+          html: htmlResult,
+          categories: categories,
+          articleCount: allArticles.length,
+          categoryBreakdown: categories.map((cat: string) => ({
+            category: cat,
+            count: allArticles.filter((a) => a.category === cat).length,
+          })),
+        };
       }
     );
+
+    // Move send-email to its own step (not nested)
+    await step.run("send-email", async () => {
+      await sendEmail(
+        event.data.email,
+        event.data.categories.join(", "),
+        allArticles.length,
+        processedNewsletter.html
+      );
+    });
   }
 );
