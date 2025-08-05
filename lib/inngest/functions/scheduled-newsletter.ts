@@ -5,7 +5,7 @@ import { marked } from "marked";
 import { sendEmail } from "@/lib/email";
 import { createClient } from "@/lib/server";
 
-export default inngest.createFunction(
+export const scheduledNewsletterFunction = inngest.createFunction(
   { id: "newsletter/scheduled" },
   { event: "newsletter.schedule" },
   async ({ event, step, runId }) => {
