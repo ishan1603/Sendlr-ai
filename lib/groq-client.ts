@@ -98,7 +98,7 @@ Please create a well-structured newsletter with:
 Make sure ALL selected categories (${categories.join(", ")}) are represented with quality content. Distribute the articles evenly across all categories.`,
         },
       ],
-      model: "llama-3.1-70b-versatile", // Fast and free model
+      model: "llama-3.1-8b-instant", // Fast and free model (updated)
       temperature: 0.7,
       max_tokens: 2000, // Increased to handle multiple categories
     });
