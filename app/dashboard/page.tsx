@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotification } from "@/contexts/NotificationContext";
 import ConfirmModal from "@/components/ConfirmModal";
+import ScheduleModal from "@/components/ScheduleModal";
 import Link from "next/link";
 
 interface UserPreferences {
@@ -13,15 +14,19 @@ interface UserPreferences {
   email: string;
   is_active: boolean;
   created_at: string;
+  send_time?: string;
 }
 
 export default function DashboardPage() {
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [pendingAction, setPendingAction] = useState<"pause" | "resume" | null>(
-    null
-  );
+  const [pendingAction, setPendingAction] = useState<
+    "pause" | "resume" | "send-now" | null
+  >(null);
+  const [isSending, setIsSending] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [isScheduling, setIsScheduling] = useState(false);
   const router = useRouter();
   const { user } = useAuth();
   const { showSuccess, showError } = useNotification();
@@ -60,8 +65,84 @@ export default function DashboardPage() {
     setShowConfirmModal(true);
   };
 
+  const handleSendNowClick = () => {
+    setPendingAction("send-now");
+    setShowConfirmModal(true);
+  };
+
+  const handleScheduleClick = () => {
+    setShowScheduleModal(true);
+  };
+
+  const handleScheduleConfirm = async (scheduledTime: Date) => {
+    setIsScheduling(true);
+    try {
+      const response = await fetch("/api/schedule-newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scheduledTime: scheduledTime.toISOString(),
+        }),
+      });
+
+      if (response.ok) {
+        showSuccess(
+          "Newsletter Scheduled",
+          `Newsletter scheduled for ${scheduledTime.toLocaleDateString()} at ${scheduledTime.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true })}`
+        );
+      } else {
+        const errorData = await response.json();
+        showError(
+          "Schedule Failed",
+          errorData.error || "Failed to schedule newsletter"
+        );
+      }
+    } catch (error) {
+      console.error("Error scheduling newsletter:", error);
+      showError("Schedule Failed", "Failed to schedule newsletter");
+    } finally {
+      setIsScheduling(false);
+      setShowScheduleModal(false);
+    }
+  };
+
+  const handleScheduleCancel = () => {
+    setShowScheduleModal(false);
+  };
+
   const handleConfirmAction = async () => {
     if (!user || !pendingAction) return;
+
+    if (pendingAction === "send-now") {
+      setIsSending(true);
+      try {
+        const response = await fetch("/api/send-newsletter", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (response.ok) {
+          showSuccess(
+            "Newsletter Sent",
+            "Newsletter has been sent successfully"
+          );
+        } else {
+          const errorData = await response.json();
+          showError(
+            "Send Failed",
+            errorData.error || "Failed to send newsletter"
+          );
+        }
+      } catch (error) {
+        console.error("Error sending newsletter:", error);
+        showError("Send Failed", "Failed to send newsletter");
+      } finally {
+        setIsSending(false);
+        setShowConfirmModal(false);
+        setPendingAction(null);
+      }
+      return;
+    }
 
     const isActivating = pendingAction === "resume";
 
@@ -167,6 +248,21 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
+                  <h3 className="text-[12px] text-black mb-2">SEND TIME</h3>
+                  <p className="text-[10px] text-black">
+                    {preferences.send_time
+                      ? new Date(
+                          `2000-01-01T${preferences.send_time}`
+                        ).toLocaleTimeString([], {
+                          hour: "numeric",
+                          minute: "2-digit",
+                          hour12: true,
+                        })
+                      : "9:00 AM"}
+                  </p>
+                </div>
+
+                <div>
                   <h3 className="text-[12px] text-black mb-2">STATUS</h3>
                   <div className="flex items-center">
                     <div
@@ -247,6 +343,30 @@ export default function DashboardPage() {
                       RESUME NEWSLETTER
                     </button>
                   )}
+
+                  <button
+                    onClick={handleSendNowClick}
+                    disabled={isSending}
+                    className="w-full flex items-center justify-center px-4 py-3 border-2 border-black text-[10px] bg-white text-black hover:bg-black hover:text-white transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      fontFamily: "Press Start 2P",
+                      boxShadow: "3px 3px 0px #000000",
+                    }}
+                  >
+                    {isSending ? "SENDING..." : "SEND NOW"}
+                  </button>
+
+                  <button
+                    onClick={handleScheduleClick}
+                    disabled={isScheduling}
+                    className="w-full flex items-center justify-center px-4 py-3 border-2 border-black text-[10px] bg-white text-black hover:bg-black hover:text-white transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      fontFamily: "Press Start 2P",
+                      boxShadow: "3px 3px 0px #000000",
+                    }}
+                  >
+                    {isScheduling ? "SCHEDULING..." : "SCHEDULE SEND"}
+                  </button>
                 </>
               )}
 
@@ -269,8 +389,10 @@ export default function DashboardPage() {
           <h3 className="text-[12px] text-black mb-2">HOW IT WORKS</h3>
           <ul className="text-[10px] text-black space-y-1">
             <li>{">"} NEWSLETTER AUTO-GENERATED FROM YOUR CATEGORIES</li>
-            <li>{">"} DELIVERED AT 9 AM BASED ON YOUR FREQUENCY</li>
+            <li>{">"} DELIVERED AT YOUR SELECTED TIME BASED ON FREQUENCY</li>
             <li>{">"} PAUSE/RESUME ANYTIME</li>
+            <li>{">"} SEND IMMEDIATELY WITH "SEND NOW" BUTTON</li>
+            <li>{">"} SCHEDULE FOR SPECIFIC DATE/TIME</li>
             <li>{">"} UPDATE PREFERENCES TO CHANGE SETTINGS</li>
           </ul>
         </div>
@@ -280,18 +402,40 @@ export default function DashboardPage() {
       <ConfirmModal
         isOpen={showConfirmModal}
         title={
-          pendingAction === "pause" ? "Pause Newsletter" : "Resume Newsletter"
+          pendingAction === "pause"
+            ? "Pause Newsletter"
+            : pendingAction === "resume"
+              ? "Resume Newsletter"
+              : "Send Newsletter Now"
         }
         message={
           pendingAction === "pause"
             ? "Are you sure you want to pause your newsletter? You won't receive any new newsletters until you resume."
-            : "Are you sure you want to resume your newsletter? You'll start receiving newsletters according to your schedule."
+            : pendingAction === "resume"
+              ? "Are you sure you want to resume your newsletter? You'll start receiving newsletters according to your schedule."
+              : "Are you sure you want to send a newsletter now? This will generate and send a newsletter with your current preferences immediately."
         }
-        confirmText={pendingAction === "pause" ? "PAUSE" : "RESUME"}
+        confirmText={
+          pendingAction === "pause"
+            ? "PAUSE"
+            : pendingAction === "resume"
+              ? "RESUME"
+              : isSending
+                ? "SENDING..."
+                : "SEND NOW"
+        }
         cancelText="CANCEL"
         type={pendingAction === "pause" ? "default" : "default"}
         onConfirm={handleConfirmAction}
         onCancel={handleCancelAction}
+      />
+
+      {/* Schedule Modal */}
+      <ScheduleModal
+        isOpen={showScheduleModal}
+        onClose={handleScheduleCancel}
+        onConfirm={handleScheduleConfirm}
+        isScheduling={isScheduling}
       />
     </div>
   );

@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { categories, frequency, email } = body;
+    const { categories, frequency, email, send_time } = body;
 
     if (!categories || !Array.isArray(categories) || categories.length === 0) {
       return NextResponse.json(
@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
           categories: categories,
           frequency: frequency,
           email: email,
+          send_time: send_time || "09:00",
           is_active: true,
         },
         { onConflict: "user_id" }
@@ -60,26 +61,29 @@ export async function POST(request: NextRequest) {
     // Schedule the first newsletter based on frequency
     let scheduleTime: Date;
     const now = new Date();
+    const [sendHour, sendMinute] = (send_time || "09:00")
+      .split(":")
+      .map(Number);
 
     switch (frequency) {
       case "daily":
-        // Schedule for tomorrow at 9 AM
+        // Schedule for tomorrow at specified time
         scheduleTime = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-        scheduleTime.setHours(9, 0, 0, 0);
+        scheduleTime.setHours(sendHour, sendMinute, 0, 0);
         break;
       case "weekly":
-        // Schedule for next week on the same day at 9 AM
+        // Schedule for next week on the same day at specified time
         scheduleTime = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-        scheduleTime.setHours(9, 0, 0, 0);
+        scheduleTime.setHours(sendHour, sendMinute, 0, 0);
         break;
       case "biweekly":
-        // Schedule for 3 days from now at 9 AM
-        scheduleTime = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
-        scheduleTime.setHours(9, 0, 0, 0);
+        // Schedule for 14 days from now at specified time
+        scheduleTime = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+        scheduleTime.setHours(sendHour, sendMinute, 0, 0);
         break;
       default:
         scheduleTime = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-        scheduleTime.setHours(9, 0, 0, 0);
+        scheduleTime.setHours(sendHour, sendMinute, 0, 0);
     }
 
     // Send event to Inngest to schedule the newsletter
@@ -234,7 +238,7 @@ async function rescheduleUserNewsletter(userId: string) {
     // Get user preferences
     const { data: preferences, error } = await supabase
       .from("user_preferences")
-      .select("categories, frequency, email")
+      .select("categories, frequency, email, send_time")
       .eq("user_id", userId)
       .single();
 
@@ -245,6 +249,9 @@ async function rescheduleUserNewsletter(userId: string) {
     // Calculate next schedule time
     const now = new Date();
     let nextScheduleTime: Date;
+    const [sendHour, sendMinute] = (preferences.send_time || "09:00")
+      .split(":")
+      .map(Number);
 
     switch (preferences.frequency) {
       case "daily":
@@ -254,13 +261,13 @@ async function rescheduleUserNewsletter(userId: string) {
         nextScheduleTime = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
         break;
       case "biweekly":
-        nextScheduleTime = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+        nextScheduleTime = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
         break;
       default:
         nextScheduleTime = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
     }
 
-    nextScheduleTime.setHours(9, 0, 0, 0);
+    nextScheduleTime.setHours(sendHour, sendMinute, 0, 0);
 
     // Schedule the next newsletter
     await inngest.send({

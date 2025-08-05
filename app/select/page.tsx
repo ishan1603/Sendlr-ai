@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotification } from "@/contexts/NotificationContext";
+import TimePicker from "@/components/TimePicker";
 
 const categories = [
   {
@@ -49,11 +50,35 @@ const frequencyOptions = [
 export default function SelectPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedFrequency, setSelectedFrequency] = useState<string>("weekly");
+  const [selectedTime, setSelectedTime] = useState<string>("09:00");
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
   const { user } = useAuth();
   const { showSuccess, showError, showWarning } = useNotification();
+
+  // Load existing preferences if available
+  useEffect(() => {
+    if (user) {
+      fetch("/api/user-preferences")
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+          return null;
+        })
+        .then((data) => {
+          if (data) {
+            setSelectedCategories(data.categories || []);
+            setSelectedFrequency(data.frequency || "weekly");
+            setSelectedTime(data.send_time || "09:00");
+          }
+        })
+        .catch((error) => {
+          console.log("No existing preferences found");
+        });
+    }
+  }, [user]);
 
   // useEffect(() => {
   //   fetch("/api/subscription-status")
@@ -97,6 +122,7 @@ export default function SelectPage() {
         body: JSON.stringify({
           categories: selectedCategories,
           frequency: selectedFrequency,
+          send_time: selectedTime,
           email: user.email,
         }),
       });
@@ -256,12 +282,33 @@ export default function SelectPage() {
             </div>
           </div>
 
+          {/* Send Time Section */}
+          <div className="mb-8">
+            <h2 className="text-[14px] text-black mb-4">DELIVERY TIME</h2>
+            <p className="text-[10px] text-black mb-6">
+              WHAT TIME TO SEND NEWSLETTER?
+            </p>
+
+            <div className="max-w-xs">
+              <TimePicker
+                initialTime={selectedTime}
+                onTimeChange={setSelectedTime}
+                disabled={isSaving}
+              />
+            </div>
+          </div>
+
           {/* Submit Button */}
           <div className="flex items-center justify-between">
             <div className="text-[10px] text-black">
               {selectedCategories.length} CATEGOR
               {selectedCategories.length !== 1 ? "IES" : "Y"} •{" "}
-              {selectedFrequency.toUpperCase()}
+              {selectedFrequency.toUpperCase()} •{" "}
+              {new Date(`2000-01-01T${selectedTime}`).toLocaleTimeString([], {
+                hour: "numeric",
+                minute: "2-digit",
+                hour12: true,
+              })}
             </div>
             <button
               type="submit"
