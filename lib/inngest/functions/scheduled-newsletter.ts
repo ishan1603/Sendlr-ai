@@ -93,21 +93,32 @@ export const scheduledNewsletterFunction = inngest.createFunction(
     );
 
     await step.run("send-email", async () => {
-      await sendEmail(
-        event.data.email,
-        event.data.categories.join(", "),
-        allArticles.length,
-        processedNewsletter.html
-      );
+      try {
+        await sendEmail(
+          event.data.email,
+          event.data.categories.join(", "),
+          allArticles.length,
+          processedNewsletter.html
+        );
 
-      const sendType = event.data.isImmediate
-        ? "(immediate)"
-        : event.data.isScheduled
-          ? "(scheduled)"
-          : "(regular)";
-      console.log(
-        `Newsletter sent successfully to ${event.data.email} ${sendType}`
-      );
+        const sendType = event.data.isImmediate
+          ? "(immediate)"
+          : event.data.isScheduled
+            ? "(scheduled)"
+            : "(regular)";
+        console.log(
+          `Newsletter sent successfully to ${event.data.email} ${sendType}`
+        );
+      } catch (error) {
+        console.error("Error sending email:", error);
+        console.error("Email data:", {
+          email: event.data.email,
+          categories: event.data.categories,
+          articleCount: allArticles.length,
+          htmlLength: processedNewsletter.html?.length || 0,
+        });
+        throw error;
+      }
     });
 
     // Schedule next newsletter if this was a regular scheduled send (not immediate or one-time scheduled)

@@ -9,6 +9,11 @@ export async function sendEmail(
   newsletter_content: string
 ) {
   try {
+    // Check if API key is available
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY environment variable is not set");
+    }
+
     const emailTemplate = `<!DOCTYPE html>
 <html>
   <head>
@@ -57,6 +62,10 @@ export async function sendEmail(
   </body>
 </html>`;
 
+    console.log(`Attempting to send email to: ${email}`);
+    console.log(`Email categories: ${categories}`);
+    console.log(`Article count: ${article_count}`);
+
     const { data, error } = await resend.emails.send({
       from: "Sendlr/ai <onboarding@resend.dev>", // Resend's verified test domain
       to: [email],
@@ -65,13 +74,21 @@ export async function sendEmail(
     });
 
     if (error) {
-      throw new Error(`Resend API error: ${error.message}`);
+      console.error("Resend API returned error:", error);
+      const errorMessage =
+        error.message || error.name || JSON.stringify(error) || "Unknown error";
+      throw new Error(`Resend API error: ${errorMessage}`);
     }
 
     console.log("Email sent successfully:", data);
     return data;
   } catch (error) {
     console.error("Failed to send email:", error);
+    console.error("Error details:", {
+      name: error instanceof Error ? error.name : "Unknown",
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : "No stack trace",
+    });
     throw error;
   }
 }
