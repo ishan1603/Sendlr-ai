@@ -1,3 +1,10 @@
+// Add delay between API calls to avoid rate limiting
+async function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+import { getEnhancedFallbackNews } from './fallback-news';
+
 export async function fetchArticles(
   categories: string[]
 ): Promise<
@@ -5,8 +12,17 @@ export async function fetchArticles(
 > {
   const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-  const promises = categories.map(async (category) => {
+  // Process categories sequentially with delays to avoid rate limiting
+  const allArticles: Array<{ title: string; url: string; description: string; category: string }> = [];
+  
+  for (let i = 0; i < categories.length; i++) {
+    const category = categories[i];
+    
     try {
+      // Add delay between requests (except for the first one)
+      if (i > 0) {
+        await delay(2000); // 2 second delay between requests to be safer
+      }
       // Use more specific search terms and sources for better results
       const searchQuery =
         category === "science"
@@ -50,6 +66,15 @@ export async function fetchArticles(
           response.statusText
         );
 
+        // Handle rate limiting specifically
+        if (response.status === 429) {
+          console.log(`Rate limited for ${category}. Using enhanced fallback content.`);
+          // Get enhanced fallback content for this category
+          const fallbackArticles = getEnhancedFallbackNews([category]);
+          allArticles.push(...fallbackArticles);
+          continue; // Skip API calls for this category
+        }
+
         // Try with a simpler approach using top-headlines
         console.log(`Trying fallback approach for category: ${category}`);
         const fallbackCategory =
@@ -85,12 +110,14 @@ export async function fetchArticles(
           console.log(
             `Fallback found ${fallbackData.articles?.length || 0} articles for ${category}`
           );
-          return fallbackData.articles.slice(0, 5).map((article: any) => ({
+          const fallbackArticles = fallbackData.articles.slice(0, 5).map((article: any) => ({
             title: article.title,
             url: article.url,
             description: article.description || "No description available",
             category: category,
           }));
+          allArticles.push(...fallbackArticles);
+          continue; // Move to next category
         } else {
           console.error(
             `Fallback also failed for ${category}:`,
@@ -99,7 +126,7 @@ export async function fetchArticles(
           );
         }
 
-        return [];
+        continue; // Skip this category and move to next
       }
 
       const data = await response.json();
@@ -135,12 +162,14 @@ export async function fetchArticles(
           );
 
           if (simpleData.articles && simpleData.articles.length > 0) {
-            return simpleData.articles.slice(0, 5).map((article: any) => ({
+            const simpleArticles = simpleData.articles.slice(0, 5).map((article: any) => ({
               title: article.title,
               url: article.url,
               description: article.description || "No description available",
               category: category,
             }));
+            allArticles.push(...simpleArticles);
+            continue; // Move to next category
           }
         }
       }
@@ -172,15 +201,15 @@ export async function fetchArticles(
       console.log(
         `Filtered to ${filteredArticles.length} articles for ${category}`
       );
-      return filteredArticles;
+      allArticles.push(...filteredArticles);
     } catch (error) {
       console.error(`Error fetching ${category}:`, error);
-      return [];
+      
+      // Use enhanced fallback content instead of simple mock articles
+      const fallbackArticles = getEnhancedFallbackNews([category]);
+      allArticles.push(...fallbackArticles);
     }
-  });
-
-  const results = await Promise.all(promises);
-  const allArticles = results.flat();
+  }
 
   console.log(`Total articles fetched: ${allArticles.length}`);
   console.log(
