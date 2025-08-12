@@ -25,51 +25,76 @@ export async function sendEmailNodemailer(
       );
     }
 
+    // Build a simple, inline-styled, table-based template to improve deliverability
+    const today = new Date();
+    const dateStr = today.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    const unsubscribeMailto = `mailto:${process.env.GMAIL_USER}?subject=${encodeURIComponent(
+      "Unsubscribe"
+    )}&body=${encodeURIComponent(`Please unsubscribe ${email} from Sendlr AI newsletters.`)}`;
+
+    // Plain-text fallback (simple strip to keep it readable)
+    const textContent =
+      `Sendlr AI – ${categories} (${dateStr})\n${article_count} articles\n\n` +
+      newsletter_content
+        .replace(/<style[\s\S]*?<\/style>/gi, "")
+        .replace(/<script[\s\S]*?<\/script>/gi, "")
+        .replace(/<br\s*\/?>(?=\s*<)/gi, "\n")
+        .replace(/<\/(p|div|h\d|li)>/gi, "\n\n")
+        .replace(/<li>/gi, "- ")
+        .replace(/<[^>]+>/g, "")
+        .replace(/&nbsp;/g, " ")
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .trim() +
+      `\n\nUnsubscribe: ${unsubscribeMailto}`;
+
     const emailTemplate = `<!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <title>Sendlr/ai Newsletter</title>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sendlr AI Newsletter</title>
   </head>
-  <body style="margin: 0; padding: 30px; background: #f5f5f5; font-family: 'Press Start 2P', monospace; color: #333333;">
-
-    <div style="max-width: 700px; margin: auto; background: #ffffff; border: 3px solid #333333; box-shadow: 8px 8px 0px #cccccc;">
-      
-      <!-- Header -->
-      <div style="background: #333333; color: #ffffff; padding: 25px; text-align: center;">
-        <div style="font-size: 20px; margin-bottom: 10px;">
-          📰 SENDLR/AI
-        </div>
-        <div style="font-size: 12px;">
-          YOUR DAILY TECH DIGEST
-        </div>
-      </div>
-
-      <div style="background: #eeeeee; padding: 15px 25px; border-bottom: 2px solid #333333;">
-        <div style="font-size: 11px; text-align: center;">
-          📅 ${new Date().toLocaleDateString()} • 📂 ${categories.toUpperCase()} • 📊 ${article_count} STORIES
-        </div>
-      </div>
-
-      <div style="padding: 30px 25px; font-size: 12px; line-height: 1.8; color: #444444;">
-        ${newsletter_content}
-      </div>
-
-      <!-- Footer -->
-      <div style="background: #333333; color: #ffffff; padding: 20px; text-align: center; font-size: 10px;">
-        <div style="margin-bottom: 5px;">
-          ⚡ POWERED BY SENDLR/AI ⚡
-        </div>
-        <div style="font-size: 8px; color: #cccccc;">
-          Unsubscribe anytime in your settings
-        </div>
-      </div>
-
+  <body style="margin:0;padding:0;background:#ffffff;color:#111111;">
+    <!-- Preheader (hidden) -->
+    <div style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;">
+      ${categories} · ${article_count} articles · ${dateStr}
     </div>
-
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;font-family:Arial,Helvetica,sans-serif;">
+            <tr>
+              <td style="padding:16px 20px;">
+                <div style="font-size:18px;font-weight:700;line-height:1.4;">Sendlr AI</div>
+                <div style="font-size:12px;color:#555;margin-top:4px;">${categories} · ${article_count} articles · ${dateStr}</div>
+              </td>
+            </tr>
+            <tr><td style="height:1px;background:#e5e7eb;line-height:1px;font-size:0;">&nbsp;</td></tr>
+            <tr>
+              <td style="padding:16px 20px;font-size:14px;line-height:1.6;">
+                ${newsletter_content}
+              </td>
+            </tr>
+            <tr><td style="height:1px;background:#e5e7eb;line-height:1px;font-size:0;">&nbsp;</td></tr>
+            <tr>
+              <td style="padding:12px 20px;">
+                <div style="font-size:12px;color:#555;">
+                  You’re receiving this because you subscribed to Sendlr AI.
+                  <a href="${unsubscribeMailto}" style="color:#065f46;text-decoration:underline;">Unsubscribe</a>.
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   </body>
 </html>`;
 
@@ -79,11 +104,17 @@ export async function sendEmailNodemailer(
 
     const transporter = createTransporter();
 
-    const mailOptions = {
-      from: `"Sendlr/ai" <${process.env.GMAIL_USER}>`,
+    const mailOptions: nodemailer.SendMailOptions = {
+      from: `"Sendlr AI" <${process.env.GMAIL_USER}>`,
       to: email,
-      subject: `📰 Your ${categories} Newsletter - ${new Date().toLocaleDateString()}`,
+      subject: `Your ${categories} newsletter – ${dateStr}`,
       html: emailTemplate,
+      text: textContent,
+      headers: {
+        // Simple List-Unsubscribe header to reduce spam likelihood
+        "List-Unsubscribe": `<${unsubscribeMailto}>`,
+      },
+      replyTo: process.env.GMAIL_USER,
     };
 
     const result = await transporter.sendMail(mailOptions);

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/client";
-import Link from "next/link";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -58,7 +57,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12px-4sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Sendlr/ai</h1>
@@ -68,6 +67,64 @@ export default function SignInPage() {
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-8">
+          {/* Mode tabs for clearer state indication */}
+          <div className="mb-6" role="tablist" aria-label="Authentication mode">
+            <div className="grid grid-cols-2 gap-1 p-1 bg-gray-100 rounded-lg">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={!isSignUp}
+                onClick={() => {
+                  setIsSignUp(false);
+                  setError(null);
+                  setMessage(null);
+                }}
+                className={`${
+                  !isSignUp
+                    ? "bg-white text-gray-900 shadow"
+                    : "text-gray-600 hover:text-gray-800"
+                } flex items-center justify-center py-2 rounded-md text-sm font-medium transition-colors`}
+              >
+                Sign in
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={isSignUp}
+                onClick={() => {
+                  setIsSignUp(true);
+                  setError(null);
+                  setMessage(null);
+                }}
+                className={`${
+                  isSignUp
+                    ? "bg-white text-gray-900 shadow"
+                    : "text-gray-600 hover:text-gray-800"
+                } flex items-center justify-center py-2 rounded-md text-sm font-medium transition-colors`}
+              >
+                Sign up
+              </button>
+            </div>
+          </div>
+
+          {/* Prominent mode badge + heading */}
+          <div className="flex items-center justify-center mb-6">
+            <span
+              aria-live="polite"
+              className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase ${
+                isSignUp
+                  ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                  : "bg-blue-100 text-blue-700 border border-blue-200"
+              }`}
+            >
+              {isSignUp ? "Sign up" : "Sign in"}
+            </span>
+          </div>
+
+          <h2 className="text-2xl font-semibold text-center mb-6">
+            {isSignUp ? "Create your account" : "Welcome back"}
+          </h2>
+
           <form onSubmit={handleAuth} className="space-y-6">
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-md p-4">
@@ -96,7 +153,11 @@ export default function SignInPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-black focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-black focus:outline-none ${
+                  isSignUp
+                    ? "focus:ring-emerald-500 focus:border-emerald-500"
+                    : "focus:ring-blue-500 focus:border-blue-500"
+                }`}
                 placeholder="Enter your email"
               />
             </div>
@@ -116,19 +177,30 @@ export default function SignInPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border text-black border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className={`mt-1 block w-full px-3 py-2 border text-black border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none ${
+                  isSignUp
+                    ? "focus:ring-emerald-500 focus:border-emerald-500"
+                    : "focus:ring-blue-500 focus:border-blue-500"
+                }`}
                 placeholder="Enter your password"
               />
+              {isSignUp && (
+                <p className="mt-1 text-xs text-gray-500">
+                  Use at least 6 characters.
+                </p>
+              )}
             </div>
 
             <div>
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full flex justify-center py-2 px-4 cursor-pointer border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2ocus:ring-blue-500 ${
+                className={`w-full flex justify-center py-2 px-4 cursor-pointer border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                   isLoading
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
+                    : isSignUp
+                      ? "bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500"
+                      : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
                 }`}
               >
                 {isLoading ? (
