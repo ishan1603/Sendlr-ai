@@ -51,8 +51,7 @@ export async function sendEmailNodemailer(
         .replace(/&amp;/g, "&")
         .replace(/&lt;/g, "<")
         .replace(/&gt;/g, ">")
-        .trim() +
-      `\n\nUnsubscribe: ${unsubscribeMailto}`;
+        .trim();
 
     const emailTemplate = `<!DOCTYPE html>
 <html lang="en">
@@ -83,14 +82,6 @@ export async function sendEmailNodemailer(
               </td>
             </tr>
             <tr><td style="height:1px;background:#e5e7eb;line-height:1px;font-size:0;">&nbsp;</td></tr>
-            <tr>
-              <td style="padding:12px 20px;">
-                <div style="font-size:12px;color:#555;">
-                  You’re receiving this because you subscribed to Sendlr AI.
-                  <a href="${unsubscribeMailto}" style="color:#065f46;text-decoration:underline;">Unsubscribe</a>.
-                </div>
-              </td>
-            </tr>
           </table>
         </td>
       </tr>

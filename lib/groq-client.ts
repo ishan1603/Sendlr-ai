@@ -29,18 +29,22 @@ export async function generateNewsletterSummary(
       messages: [
         {
           role: "system",
-          content: `You are Sendlr, a concise newsletter formatter. Output minimal HTML only. Do NOT include greetings, sign-offs (e.g., "Best regards"), disclaimers, placeholders (e.g., [insert ...]), or unsubscribe/CTA language. No emojis. Do not mention your name in the output. Group stories by category and list only titles as links.`,
+          content: `You are sendlr ai, a concise newsletter formatter. Output minimal HTML only. Do NOT include greetings, sign-offs (e.g., "Best regards"), disclaimers, placeholders (e.g., [insert ...]), or unsubscribe/CTA language. No emojis. Do not mention your name in the output. Group stories by category; each item has a linked title followed by a brief 1–2 sentence paragraph.`,
         },
         {
           role: "user",
-          content: `Format these ${categories.join(", ")} news items as minimal HTML with titles only.
+          content: `Format these ${categories.join(", ")} news items as minimal HTML with a title link and a brief paragraph under each.
 
 STRICT RULES:
 - HTML only, no prose outside the structure
-- Allowed tags: <h3>, <ul>, <li>, <a>
+- Allowed tags: <h3>, <ul>, <li>, <a>, <p>
 - Group by category (${categories.join(", ")})
-- Each item: a single <li><a href="SOURCE">TITLE</a></li>
-- No summaries, no intros, no conclusions
+- Each item structure:
+  <li>
+    <a href="SOURCE">TITLE</a>
+    <p>Brief 1–2 sentence summary in English.</p>
+  </li>
+- No intros or conclusions
 - No greetings, signatures (e.g., "Best regards"), disclaimers, placeholders, or unsubscribe text
 - English-only content
 
@@ -58,7 +62,10 @@ URL: ${article.url}
 OUTPUT SHAPE EXAMPLE (use this structure, no extra text):
 <h3>CATEGORY NAME</h3>
 <ul>
-  <li><a href="https://example.com">Story title</a></li>
+  <li>
+    <a href="https://example.com">Story title</a>
+    <p>One short paragraph describing what’s new and why it matters.</p>
+  </li>
 </ul>`,
         },
       ],
@@ -116,7 +123,11 @@ function generateFallbackNewsletter(articles: any[], categories: string[]) {
           .toString()
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;");
-        content += `\n  <li><a href="${article.url}" target="_blank" rel="noopener noreferrer">${safeTitle}</a></li>`;
+        const safeDesc = (article.description || "")
+          .toString()
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+        content += `\n  <li>\n    <a href="${article.url}" target="_blank" rel="noopener noreferrer">${safeTitle}</a>\n    <p>${safeDesc}</p>\n  </li>`;
       });
       content += `\n</ul>`;
     }
