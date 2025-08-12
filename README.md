@@ -51,11 +51,11 @@ Sendlr AI is a sophisticated SaaS platform that automates the creation and deliv
 
 👉 **Automated Scheduling System**: Sophisticated scheduling engine supporting multiple delivery frequencies (daily, weekly, bi-weekly) with timezone-aware delivery and user preference management.
 
-� **Durable Workflow Management**: Built with Inngest's reliable execution framework featuring automatic retries, error handling, and comprehensive monitoring for mission-critical newsletter delivery.
+👉 **Durable Workflow Management**: Built with Inngest's reliable execution framework featuring automatic retries, error handling, and comprehensive monitoring for mission-critical newsletter delivery.
 
-� **User Authentication & Management**: Secure Supabase authentication with granular preference controls, subscription management, and real-time status updates.
+👉 **User Authentication & Management**: Secure Supabase authentication with granular preference controls, subscription management, and real-time status updates.
 
-� **Real-time Dashboard**: Interactive control panel with live newsletter management, scheduling controls, preference updates, and comprehensive usage analytics.
+👉 **Real-time Dashboard**: Interactive control panel with live newsletter management, scheduling controls, preference updates, and comprehensive usage analytics.
 
 👉 **Professional Email Templates**: Responsive HTML email templates with organized content structure and delivery optimization through Resend integration.
 
@@ -63,7 +63,7 @@ Sendlr AI is a sophisticated SaaS platform that automates the creation and deliv
 
 👉 **Database Security**: Advanced PostgreSQL implementation with Row Level Security (RLS), optimized indexing, and automated timestamp management.
 
-� **Background Job Processing**: Robust workflow orchestration with Inngest handling newsletter generation, scheduling, and delivery with fault tolerance.
+👉 **Background Job Processing**: Robust workflow orchestration with Inngest handling newsletter generation, scheduling, and delivery with fault tolerance.
 
 👉 **Cross-Device Compatibility**: Fully responsive design that works seamlessly across all devices with consistent user experience.
 
