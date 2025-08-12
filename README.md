@@ -39,7 +39,7 @@ Sendlr AI is a sophisticated SaaS platform that automates the creation and deliv
 
 - **[TypeScript](https://www.typescriptlang.org/)** is a superset of JavaScript that adds static typing, providing better tooling, code quality, and error detection for developers, making it ideal for building large-scale applications.
 
-- **[Resend](https://resend.com/)** is a modern email API service built for developers, providing reliable transactional email delivery with superior deliverability, real-time analytics, and comprehensive template management.
+- **[Nodemailer](https://nodemailer.com/)** is a modern email API service built for developers, providing reliable transactional email delivery with superior deliverability, real-time analytics, and comprehensive template management.
 
 - **[NewsAPI](https://newsapi.org/)** is a comprehensive news aggregation service that provides real-time access to news articles from thousands of sources worldwide, enabling dynamic content curation.
 
@@ -51,11 +51,11 @@ Sendlr AI is a sophisticated SaaS platform that automates the creation and deliv
 
 👉 **Automated Scheduling System**: Sophisticated scheduling engine supporting multiple delivery frequencies (daily, weekly, bi-weekly) with timezone-aware delivery and user preference management.
 
-� **Durable Workflow Management**: Built with Inngest's reliable execution framework featuring automatic retries, error handling, and comprehensive monitoring for mission-critical newsletter delivery.
+👉 **Durable Workflow Management**: Built with Inngest's reliable execution framework featuring automatic retries, error handling, and comprehensive monitoring for mission-critical newsletter delivery.
 
-� **User Authentication & Management**: Secure Supabase authentication with granular preference controls, subscription management, and real-time status updates.
+👉 **User Authentication & Management**: Secure Supabase authentication with granular preference controls, subscription management, and real-time status updates.
 
-� **Real-time Dashboard**: Interactive control panel with live newsletter management, scheduling controls, preference updates, and comprehensive usage analytics.
+👉 **Real-time Dashboard**: Interactive control panel with live newsletter management, scheduling controls, preference updates, and comprehensive usage analytics.
 
 👉 **Professional Email Templates**: Responsive HTML email templates with organized content structure and delivery optimization through Resend integration.
 
@@ -63,7 +63,7 @@ Sendlr AI is a sophisticated SaaS platform that automates the creation and deliv
 
 👉 **Database Security**: Advanced PostgreSQL implementation with Row Level Security (RLS), optimized indexing, and automated timestamp management.
 
-� **Background Job Processing**: Robust workflow orchestration with Inngest handling newsletter generation, scheduling, and delivery with fault tolerance.
+👉 **Background Job Processing**: Robust workflow orchestration with Inngest handling newsletter generation, scheduling, and delivery with fault tolerance.
 
 👉 **Cross-Device Compatibility**: Fully responsive design that works seamlessly across all devices with consistent user experience.
 
