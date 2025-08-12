@@ -39,7 +39,7 @@ Sendlr AI is a sophisticated SaaS platform that automates the creation and deliv
 
 - **[TypeScript](https://www.typescriptlang.org/)** is a superset of JavaScript that adds static typing, providing better tooling, code quality, and error detection for developers, making it ideal for building large-scale applications.
 
-- **[Resend](https://resend.com/)** is a modern email API service built for developers, providing reliable transactional email delivery with superior deliverability, real-time analytics, and comprehensive template management.
+- **[Nodemailer](https://nodemailer.com/)** is a modern email API service built for developers, providing reliable transactional email delivery with superior deliverability, real-time analytics, and comprehensive template management.
 
 - **[NewsAPI](https://newsapi.org/)** is a comprehensive news aggregation service that provides real-time access to news articles from thousands of sources worldwide, enabling dynamic content curation.
 
